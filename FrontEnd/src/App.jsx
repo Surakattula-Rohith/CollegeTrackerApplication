@@ -1,35 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Home from "./components/Home";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import { Routes, Route, useNavigate } from "react-router-dom";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import { setupAxiosInterceptors } from "./api";
+import { useEffect } from "react";
+import Forget from "./components/Forget";
+import Reset from "./components/Reset";
+import { useSelector } from "react-redux";
+import StudentDashboard from "./pages/student/StudentDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ProfessorDashboard from "./pages/professor/ProfessorDashboard";
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const navigate = useNavigate();
+  const { loading } = useSelector((state) => {
+    return state.loader;
+  });
+  useEffect(() => {
+    setupAxiosInterceptors(navigate);
+  }, [navigate]);
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {loading && (
+        <div className="loader-container">
+          <div className="loader"></div>
+        </div>
+      )}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/professor"
+          element={
+            <ProtectedRoute>
+              <ProfessorDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        <Route path="/forget" element={<Forget />} />
+        <Route path="/reset" element={<Reset />} />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
